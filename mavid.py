@@ -10,7 +10,7 @@ Author: Ilya Stepanov <code at ilyastepanov.com>
 """
  
  
-from __future__ import print_function
+#from __future__ import print_function
 from Bio import SeqIO
 from StringIO import StringIO
 import sys
@@ -283,22 +283,38 @@ class SuffixTree:
 # Read fasta files
 def read_sequence(file_name):
     """
-    Read the 1000 human proteins as a record
+    Read the fasta file and return a string
     """
     handle = open(file_name)
-    records = SeqIO.parse(handle, "fasta").next()            
+    
+    for record in SeqIO.parse(handle, "fasta"):
+        #print record.id
+        output = str(record.seq)
     handle.close()
 
-    temp = string(records.seq)
+        
+    return output
+
+# Recurively get all common substrings
+def get_common_substrings(str_a, str_b):
+    input_data = [str_a, str_b]
+    suffix_tree = SuffixTree()
+    for i in input_data:
+        suffix_tree.append_string(i)
+
+    lcs = suffix_tree.find_longest_common_substrings()
     
-    return temp
+    
+    
+    
  
 if __name__ == "__main__":
 
     string1 = read_sequence("sequenceA.fasta")
     string2 = read_sequence("sequenceB.fasta")
-    print(string1)
-    print(string2)
+    print string1
+    print string2
+    #wait = input("PRESS ENTER TO CONTINUE")
     suffix_tree = SuffixTree()
     #test_data = ["GATTTTAKBCCCC", "GATTTTZKBCCCC"]
     test_data = [string1, string2]
@@ -306,7 +322,18 @@ if __name__ == "__main__":
         suffix_tree.append_string(s)
     
     lcs = suffix_tree.find_longest_common_substrings()
-    print(lcs)
+    #print lcs
+    print "Printing..."
     for s in lcs:
-        print(s)
+        print s
+
+    new_string1 = string1.replace(lcs[0], "*")
+    new_string2 = string2.replace(lcs[0], "*")
+
+    test_data = [new_string1, new_string2]
+    for s in test_data:
+        suffix_tree.append_string(s)
+
+    lcs = suffix_tree.find_longest_common_substrings()
+    print lcs
 
