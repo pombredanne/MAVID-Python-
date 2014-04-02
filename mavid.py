@@ -295,14 +295,35 @@ def read_sequence(file_name):
         
     return output
 
-# Recurively get all common substrings
-def get_common_substrings(str_a, str_b):
-    input_data = [str_a, str_b]
-    suffix_tree = SuffixTree()
-    for i in input_data:
-        suffix_tree.append_string(i)
+# Recurively get all common substrings using suffix tree
+def get_common_substrings(str_a, str_b, result, counter):
 
-    lcs = suffix_tree.find_longest_common_substrings()
+    if counter != 0:
+        input_data = [str_a, str_b]
+        suffix_tree = SuffixTree()
+        for i in input_data:
+            suffix_tree.append_string(i)
+
+        lcs = suffix_tree.find_longest_common_substrings()
+
+        for i in lcs:
+            result.append(i)
+            #print i
+        
+        for i in lcs:
+            new_string_a = str_a.replace(i, "*")
+            new_string_b = str_b.replace(i, "#")
+            counter = counter - 1
+        
+        print "Counter is ", counter
+        #print result
+        get_common_substrings(new_string_a, new_string_b, result, counter)
+
+    else:
+        #print result
+        return result
+
+
     
     
     
@@ -312,28 +333,42 @@ if __name__ == "__main__":
 
     string1 = read_sequence("sequenceA.fasta")
     string2 = read_sequence("sequenceB.fasta")
-    print string1
-    print string2
-    #wait = input("PRESS ENTER TO CONTINUE")
-    suffix_tree = SuffixTree()
-    #test_data = ["GATTTTAKBCCCC", "GATTTTZKBCCCC"]
-    test_data = [string1, string2]
-    for s in test_data:
-        suffix_tree.append_string(s)
+    print "Sequence A is....", string1
+    print "Sequence B is....", string2
+    print "Now trying to get all common substrings"
+    anchor_candidates = []
+
+
+    counter = 3
+    get_common_substrings(string1, string2, anchor_candidates, counter)
+
+    print anchor_candidates
+##    for i in get_common_substrings(string1, string2, anchor_candidates):
+##        print i
+
+
     
-    lcs = suffix_tree.find_longest_common_substrings()
-    #print lcs
-    print "Printing..."
-    for s in lcs:
-        print s
-
-    new_string1 = string1.replace(lcs[0], "*")
-    new_string2 = string2.replace(lcs[0], "*")
-
-    test_data = [new_string1, new_string2]
-    for s in test_data:
-        suffix_tree.append_string(s)
-
-    lcs = suffix_tree.find_longest_common_substrings()
-    print lcs
+    
+##    wait = input("PRESS ENTER TO CONTINUE")
+##    suffix_tree = SuffixTree()
+##    test_data = ["GATTTTAKBCCCC", "GATTTTZKBCCCC"]
+##    test_data = [string1, string2]
+##    for s in test_data:
+##        suffix_tree.append_string(s)
+##    
+##    lcs = suffix_tree.find_longest_common_substrings()
+##    print lcs
+##    print "Printing..."
+##    for s in lcs:
+##        print s
+##
+##    new_string1 = string1.replace(lcs[0], "*")
+##    new_string2 = string2.replace(lcs[0], "*")
+##
+##    test_data = [new_string1, new_string2]
+##    for s in test_data:
+##        suffix_tree.append_string(s)
+##
+##    lcs = suffix_tree.find_longest_common_substrings()
+##    print lcs
 
