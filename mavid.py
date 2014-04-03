@@ -296,9 +296,13 @@ def read_sequence(file_name):
     return output
 
 # Recurively get all common substrings using suffix tree
-def get_common_substrings(str_a, str_b, result, counter):
+def get_common_substrings(str_a, str_b, result, length_of_longest_common_substring):
 
-    if counter != 0:
+   
+    #if counter != 0:
+
+    if len(result) == 0:
+        
         input_data = [str_a, str_b]
         suffix_tree = SuffixTree()
         for i in input_data:
@@ -313,20 +317,45 @@ def get_common_substrings(str_a, str_b, result, counter):
         for i in lcs:
             new_string_a = str_a.replace(i, "*")
             new_string_b = str_b.replace(i, "#")
-            counter = counter - 1
+            #counter = counter - 1
         
-        print "Counter is ", counter
+        #print "Counter is ", counter
         #print result
-        get_common_substrings(new_string_a, new_string_b, result, counter)
+        get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
 
     else:
+
+        length_of_longest_common_substring = len(result[0])
+
+        input_data = [str_a, str_b]
+        suffix_tree = SuffixTree()
+        for i in input_data:
+            suffix_tree.append_string(i)
+
+        lcs = suffix_tree.find_longest_common_substrings()
+
+        if len(lcs[0]) < int(length_of_longest_common_substring*0.5):
+            return result
+
+        else:
+
+            for i in lcs:
+                result.append(i)
+                #print i
+        
+            for i in lcs:
+                new_string_a = str_a.replace(i, "*")
+                new_string_b = str_b.replace(i, "#")
+                #counter = counter - 1
+        
+            #print "Counter is ", counter
+            #print result
+            get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
+            
+
+    #else:
         #print result
-        return result
-
-
-    
-    
-    
+        #return result
     
  
 if __name__ == "__main__":
@@ -340,7 +369,8 @@ if __name__ == "__main__":
 
 
     counter = 3
-    get_common_substrings(string1, string2, anchor_candidates, counter)
+    length_of_longest_common_substring = 0
+    get_common_substrings(string1, string2, anchor_candidates, length_of_longest_common_substring)
 
     print anchor_candidates
 ##    for i in get_common_substrings(string1, string2, anchor_candidates):
