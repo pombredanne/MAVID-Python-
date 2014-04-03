@@ -295,12 +295,15 @@ def read_sequence(file_name):
         
     return output
 
-# Recurively get all common substrings using suffix tree
 def get_common_substrings(str_a, str_b, result, length_of_longest_common_substring):
+    """
+    This function gets all the common substrings between two sequences
 
+    This function only returns the common substings that are at least
+    half as long as the longest common substrings
+    """
    
-    #if counter != 0:
-
+    # Don't know the common substrings yet, so compute the first one   
     if len(result) == 0:
         
         input_data = [str_a, str_b]
@@ -317,14 +320,13 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
         for i in lcs:
             new_string_a = str_a.replace(i, "*")
             new_string_b = str_b.replace(i, "#")
-            #counter = counter - 1
         
-        #print "Counter is ", counter
-        #print result
         get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
+
 
     else:
 
+        # Now we have the longest common substring, so get its length
         length_of_longest_common_substring = len(result[0])
 
         input_data = [str_a, str_b]
@@ -341,21 +343,13 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
 
             for i in lcs:
                 result.append(i)
-                #print i
         
             for i in lcs:
                 new_string_a = str_a.replace(i, "*")
                 new_string_b = str_b.replace(i, "#")
-                #counter = counter - 1
         
-            #print "Counter is ", counter
-            #print result
             get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
             
-
-    #else:
-        #print result
-        #return result
     
  
 if __name__ == "__main__":
