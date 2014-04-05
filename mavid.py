@@ -12,10 +12,12 @@ Author: Ilya Stepanov <code at ilyastepanov.com>
  
 #from __future__ import print_function
 from Bio import SeqIO
+from Bio import pairwise2
 from StringIO import StringIO
 import sys
 import re
 import argparse
+import time
 
 
 #Building Suffix Tree
@@ -302,7 +304,9 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
     This function only returns the common substings that are at least
     half as long as the longest common substrings
     """
-   
+        
+
+        
     # Don't know the common substrings yet, so compute the first one   
     if len(result) == 0:
         
@@ -336,7 +340,8 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
 
         lcs = suffix_tree.find_longest_common_substrings()
 
-        if len(lcs[0]) < int(length_of_longest_common_substring*0.5):
+        if len(lcs[0]) < int(length_of_longest_common_substring*0.3):
+        #if len(lcs[0]) < 2:
             return result
 
         else:
@@ -349,24 +354,283 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
                 new_string_b = str_b.replace(i, "#")
         
             get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
+
+
+def get_common_substrings2(str_a, str_b):
+    """
+    This function gets all the common substrings between two sequences
+
+    This function only returns the common substings that are at least
+    half as long as the longest common substrings
+    """
+  
+           
+
+    if len(str_a) < 4 or len(str_b) < 4:
+    #if len(str_a) != 0 and len(str_b) != 0:
+
+        print "I am here"
+        #print str_b
+        alignment = pairwise2.align.globalxx(str_a, str_b)
+        print alignment
+        #score = alignment[0][2]
+        return str(alignment[0][0]), str(alignment[0][1])
+
+    else:
+        print "call else"
+        input_data = [str_a, str_b]
+        suffix_tree = SuffixTree()
+        for i in input_data:
+            suffix_tree.append_string(i)
+
+        lcs = suffix_tree.find_longest_common_substrings()
+        print lcs
+        the_lcs = lcs[0]
+
+        #print "The LCS is...", the_lcs
+
+##        if len(the_lcs) < 8:
+##            print "Should be here"
+##            alignment = pairwise2.align.globalxx(str_a, str_b)
+##            print alignment[0][0]
+##            return str(alignment[0][0]), str(alignment[0][1])
+
+        #print the_lcs
+        lcs_start_index_str_a = str_a.index(the_lcs)
+        lcs_start_index_str_b = str_b.index(the_lcs)
+
+        #print lcs_start_index_str_a
             
+        lcs_end_index_str_a = lcs_start_index_str_a + len(the_lcs)-1
+        lcs_end_index_str_b = lcs_start_index_str_b + len(the_lcs)-1
+
+        global new_str_a_front
+        global new_str_a_back
+        global new_str_b_front
+        global new_str_b_back
+
+        if lcs_start_index_str_a == 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 1"
+            new_str_a_front = "-"
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b == 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 2"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = "-"
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+        if lcs_start_index_str_a == 0 and lcs_start_index_str_b == 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 3"
+            new_str_a_front = "-"
+            new_str_b_front = "-"
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a == (len(str_a) - 1) and lcs_end_index_str_b == (len(str_b) - 1):
+            print "Case 4"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = "-"
+            new_str_b_back = "-"
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b == (len(str_b) - 1):
+            print "Case 5"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
+            new_str_b_back = "-"
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a == (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 6"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = "-"
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+        if lcs_start_index_str_a == 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b == (len(str_b) - 1):
+            print "Case 7"
+            new_str_a_front = "-"
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
+            new_str_b_back = "-"
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b == 0 and lcs_end_index_str_a == (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 8"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = "-"
+            new_str_a_back = "-"
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+        if lcs_start_index_str_a != 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
+            print "Case 9"
+            new_str_a_front = str_a[0:lcs_start_index_str_a]
+            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
+            new_str_b_back = str_b[lcs_end_index_str_b+1:]
+
+        the_lcs_top = the_lcs
+        the_lcs_bottom = the_lcs
+        
+        print new_str_a_front, new_str_b_front
+        print new_str_a_back, new_str_b_back
+
+        dup_new_str_a_front = new_str_a_front
+        dup_new_str_b_front = new_str_b_front
+        dup_new_str_a_back = new_str_a_back
+        dup_new_str_b_back = new_str_b_back
+
+        #print get_common_substrings2(dup_new_str_a_front, dup_new_str_b_front)[0] + the_lcs + get_common_substrings2(dup_new_str_a_back, dup_new_str_b_back)[0]
+        time.sleep(5)
+        print get_common_substrings2(new_str_a_front, new_str_b_front)[0] + the_lcs_top + get_common_substrings2(new_str_a_back, new_str_b_back)[0]
+        
+        #print get_common_substrings2(dup_new_str_a_front, dup_new_str_b_front)[1] + the_lcs + get_common_substrings2(dup_new_str_a_back, dup_new_str_b_back)[1]
+
+        #print get_common_substrings2(new_str_a_front, new_str_b_front)[1] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back)[1]
+
+
+        #return new_str_a_front, new_str_b_front, new_str_a_back, new_str_b_back
+
+        
     
+    
+
+
+##def commonOverlapIndexOf(text1, text2):
+##  # Cache the text lengths to prevent multiple calls.
+##  text1_length = len(text1)
+##  text2_length = len(text2)
+##  # Eliminate the null case.
+##  if text1_length == 0 or text2_length == 0:
+##    return 0
+##  # Truncate the longer string.
+##  if text1_length > text2_length:
+##    text1 = text1[-text2_length:]
+##  elif text1_length < text2_length:
+##    text2 = text2[:text1_length]
+##  # Quick check for the worst case.
+##  if text1 == text2:
+##    return min(text1_length, text2_length)
+## 
+##  # Start by looking for a single character match
+##  # and increase length until no match is found.
+##  best = 0
+##  length = 1
+##  while True:
+##    pattern = text1[-length:]
+##    found = text2.find(pattern)
+##    if found == -1:
+##      return best
+##    length += found
+##    if text1[-length:] == text2[:length]:
+##      best = length
+##      length += 1            
+
  
+def allindices(string, sub, listindex=[], offset=0):
+    i = string.find(sub, offset)
+    while i >= 0:
+        listindex.append(i)
+        i = string.find(sub, i + 1)
+    return listindex
+
+
 if __name__ == "__main__":
 
-    string1 = read_sequence("sequenceA.fasta")
-    string2 = read_sequence("sequenceB.fasta")
+    #string1 = read_sequence("sequenceA.fasta")
+    #string2 = read_sequence("sequenceB.fasta")
+
+    string1 = "AGTCCTAACTGGGGGGGGGGGGGGGTCGATTTGCCCCCCCTGATTAAC"
+    string2 = "TCAAATCGACGGGGGGGGGGGGGGGATGACACGCCCCCCCTGACTTGG"
+    #string1 = "ACTTTCTTT"
+    #string2 = "CCACAAATTTTAAA"
+    #string1 = "TTTCCCC"
+    #string2 = "GGGTTTAAA"
+    #string1 = "AGTT"
+    #string2 = "CTT"
     print "Sequence A is....", string1
     print "Sequence B is....", string2
     print "Now trying to get all common substrings"
+
     anchor_candidates = []
 
-
-    counter = 3
+    #counter = 3
     length_of_longest_common_substring = 0
-    get_common_substrings(string1, string2, anchor_candidates, length_of_longest_common_substring)
 
-    print anchor_candidates
+    get_common_substrings2(string1, string2)
+
+    #print anchor_candidates
+
+##    get_common_substrings(string1, string2, anchor_candidates, length_of_longest_common_substring)
+##
+##    print anchor_candidates
+##
+##    length_of_longest_common_substring = len(anchor_candidates[0])
+##
+##    anchors = []
+##    benchmark = int(length_of_longest_common_substring*0.5)
+##    for i in anchor_candidates:
+##        if len(i) > benchmark:
+##            anchors.append(i)
+##
+##    #print anchors
+##
+##    anchor_positions_for_string1 = []
+##    anchor_positions_for_string2 = []
+##    
+##    # Just use anchors candidates
+##    for i in anchor_candidates:
+##        len_of_substring = len(i)
+##        list_of_start_indices_string1 = allindices(string1,i,[],0)
+##        list_of_start_indices_string2 = allindices(string2,i,[],0)
+##
+##        for j in list_of_start_indices_string1:
+##            print i, j, j+len_of_substring-1
+##            anchor_positions_for_string1.append((j, j+len_of_substring-1))
+##        for j in list_of_start_indices_string2:
+##            print i, j, j+len_of_substring-1
+##            anchor_positions_for_string2.append((j, j+len_of_substring-2))
+##    
+##
+##    print anchor_positions_for_string1
+##    print anchor_positions_for_string2
+
+
+
+
+##    anchor_dict = {}
+##    pos_dict = {}
+##
+##    temp_pos = []
+##
+##    for i in anchors:
+##        anchor_start_pos = string1.index(i)
+##        anchor_end_pos = anchor_start_pos + len(i) - 1
+##
+##        temp_pos.append(anchor_start_pos)
+##        temp_pos.append(anchor_end_pos)
+##        print anchor_start_pos, anchor_end_pos
+##
+##        
+##        anchor_dict[(anchor_start_pos, anchor_end_pos)] = i
+##        pos_dict[anchor_start_pos] = anchor_end_pos
+##
+##    if temp_pos[0] != 0 and temp_pos[-1] != (len(string1) - 1) :
+##        temp_pos = [0] + temp_pos + [len(string1)-1]
+##        print temp_pos
+##
+##
+##    for a,b in zip(*[iter(temp_pos)]*2):
+##        print a, b
+##        new_string1 = string1[a:b+1]
+##        print new_string1
+
+    
+    
 ##    for i in get_common_substrings(string1, string2, anchor_candidates):
 ##        print i
 
