@@ -356,36 +356,46 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
             get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
 
 
-def get_common_substrings2(str_a, str_b):
+def get_common_substrings2(str_a, str_b, anchor_candidates):
     """
     This function gets all the common substrings between two sequences
 
     This function only returns the common substings that are at least
     half as long as the longest common substrings
     """
-  
-           
+    #global new_str_a_front
+    #global new_str_a_back
+    #global new_str_b_front
+    #global new_str_b_back
+    
+    input_data = [str_a, str_b]
+    suffix_tree = SuffixTree()
+    for i in input_data:
+        suffix_tree.append_string(i)
 
-    if len(str_a) < 4 or len(str_b) < 4:
+    lcs = suffix_tree.find_longest_common_substrings()
+    the_lcs = lcs[0]
+
+    if len(str_a) < 4 or len(str_b) < 4 or len(the_lcs) < 2:
     #if len(str_a) != 0 and len(str_b) != 0:
 
         print "I am here"
         #print str_b
         alignment = pairwise2.align.globalxx(str_a, str_b)
-        print alignment
+        #print alignment
         #score = alignment[0][2]
         return str(alignment[0][0]), str(alignment[0][1])
 
     else:
-        print "call else"
-        input_data = [str_a, str_b]
-        suffix_tree = SuffixTree()
-        for i in input_data:
-            suffix_tree.append_string(i)
-
-        lcs = suffix_tree.find_longest_common_substrings()
-        print lcs
-        the_lcs = lcs[0]
+##        print "call else"
+##        input_data = [str_a, str_b]
+##        suffix_tree = SuffixTree()
+##        for i in input_data:
+##            suffix_tree.append_string(i)
+##
+##        lcs = suffix_tree.find_longest_common_substrings()
+##        print lcs
+##        the_lcs = lcs[0]
 
         #print "The LCS is...", the_lcs
 
@@ -395,6 +405,7 @@ def get_common_substrings2(str_a, str_b):
 ##            print alignment[0][0]
 ##            return str(alignment[0][0]), str(alignment[0][1])
 
+        print "At Else"
         #print the_lcs
         lcs_start_index_str_a = str_a.index(the_lcs)
         lcs_start_index_str_b = str_b.index(the_lcs)
@@ -404,16 +415,12 @@ def get_common_substrings2(str_a, str_b):
         lcs_end_index_str_a = lcs_start_index_str_a + len(the_lcs)-1
         lcs_end_index_str_b = lcs_start_index_str_b + len(the_lcs)-1
 
-        global new_str_a_front
-        global new_str_a_back
-        global new_str_b_front
-        global new_str_b_back
 
         if lcs_start_index_str_a == 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
             print "Case 1"
             new_str_a_front = "-"
-            new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_back = str_b[lcs_end_index_str_b+1:]
 
 
@@ -421,14 +428,14 @@ def get_common_substrings2(str_a, str_b):
             print "Case 2"
             new_str_a_front = str_a[0:lcs_start_index_str_a]
             new_str_b_front = "-"
-            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_back = str_b[lcs_end_index_str_b+1:]
 
         if lcs_start_index_str_a == 0 and lcs_start_index_str_b == 0 and lcs_end_index_str_a != (len(str_a) - 1) and lcs_end_index_str_b != (len(str_b) - 1):
             print "Case 3"
             new_str_a_front = "-"
             new_str_b_front = "-"
-            new_str_b_front = str_b[0:lcs_start_index_str_b]
+            new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_back = str_b[lcs_end_index_str_b+1:]
 
         if lcs_start_index_str_a != 0 and lcs_start_index_str_b != 0 and lcs_end_index_str_a == (len(str_a) - 1) and lcs_end_index_str_b == (len(str_b) - 1):
@@ -473,27 +480,17 @@ def get_common_substrings2(str_a, str_b):
             new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_back = str_b[lcs_end_index_str_b+1:]
 
-        the_lcs_top = the_lcs
-        the_lcs_bottom = the_lcs
+        #print new_str_b_front
         
         print new_str_a_front, new_str_b_front
         print new_str_a_back, new_str_b_back
 
-        dup_new_str_a_front = new_str_a_front
-        dup_new_str_b_front = new_str_b_front
-        dup_new_str_a_back = new_str_a_back
-        dup_new_str_b_back = new_str_b_back
-
-        #print get_common_substrings2(dup_new_str_a_front, dup_new_str_b_front)[0] + the_lcs + get_common_substrings2(dup_new_str_a_back, dup_new_str_b_back)[0]
         time.sleep(5)
-        print get_common_substrings2(new_str_a_front, new_str_b_front)[0] + the_lcs_top + get_common_substrings2(new_str_a_back, new_str_b_back)[0]
+        temp1 = get_common_substrings2(new_str_a_front, new_str_b_front, anchor_candidates)[0] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back, anchor_candidates)[0]
+        temp2 = get_common_substrings2(new_str_a_front, new_str_b_front, anchor_candidates)[1] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back, anchor_candidates)[1]
+
+        return temp1, temp2
         
-        #print get_common_substrings2(dup_new_str_a_front, dup_new_str_b_front)[1] + the_lcs + get_common_substrings2(dup_new_str_a_back, dup_new_str_b_back)[1]
-
-        #print get_common_substrings2(new_str_a_front, new_str_b_front)[1] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back)[1]
-
-
-        #return new_str_a_front, new_str_b_front, new_str_a_back, new_str_b_back
 
         
     
@@ -556,14 +553,16 @@ if __name__ == "__main__":
     print "Sequence B is....", string2
     print "Now trying to get all common substrings"
 
-    anchor_candidates = []
+    anchor_candidates = ""
 
     #counter = 3
     length_of_longest_common_substring = 0
 
-    get_common_substrings2(string1, string2)
+    result = get_common_substrings2(string1, string2, anchor_candidates)
 
-    #print anchor_candidates
+    print result[0]
+    print result[1]
+    print anchor_candidates
 
 ##    get_common_substrings(string1, string2, anchor_candidates, length_of_longest_common_substring)
 ##
