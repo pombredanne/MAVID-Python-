@@ -356,7 +356,7 @@ def get_common_substrings(str_a, str_b, result, length_of_longest_common_substri
             get_common_substrings(new_string_a, new_string_b, result, length_of_longest_common_substring)
 
 
-def get_common_substrings2(str_a, str_b, anchor_candidates):
+def get_common_substrings2(str_a, str_b):
     """
     This function gets all the common substrings between two sequences
 
@@ -376,10 +376,10 @@ def get_common_substrings2(str_a, str_b, anchor_candidates):
     lcs = suffix_tree.find_longest_common_substrings()
     the_lcs = lcs[0]
 
-    if len(str_a) < 4 or len(str_b) < 4 or len(the_lcs) < 2:
+    if len(str_a) < 4 or len(str_b) < 4 or len(the_lcs) < 8:
     #if len(str_a) != 0 and len(str_b) != 0:
 
-        print "I am here"
+        #print "I am here"
         #print str_b
         alignment = pairwise2.align.globalxx(str_a, str_b)
         #print alignment
@@ -405,7 +405,7 @@ def get_common_substrings2(str_a, str_b, anchor_candidates):
 ##            print alignment[0][0]
 ##            return str(alignment[0][0]), str(alignment[0][1])
 
-        print "At Else"
+        #print "At Else"
         #print the_lcs
         lcs_start_index_str_a = str_a.index(the_lcs)
         lcs_start_index_str_b = str_b.index(the_lcs)
@@ -482,12 +482,12 @@ def get_common_substrings2(str_a, str_b, anchor_candidates):
 
         #print new_str_b_front
         
-        print new_str_a_front, new_str_b_front
-        print new_str_a_back, new_str_b_back
+        #print new_str_a_front, new_str_b_front
+        #print new_str_a_back, new_str_b_back
 
-        time.sleep(5)
-        temp1 = get_common_substrings2(new_str_a_front, new_str_b_front, anchor_candidates)[0] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back, anchor_candidates)[0]
-        temp2 = get_common_substrings2(new_str_a_front, new_str_b_front, anchor_candidates)[1] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back, anchor_candidates)[1]
+        #time.sleep(5)
+        temp1 = get_common_substrings2(new_str_a_front, new_str_b_front)[0] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back)[0]
+        temp2 = get_common_substrings2(new_str_a_front, new_str_b_front)[1] + the_lcs + get_common_substrings2(new_str_a_back, new_str_b_back)[1]
 
         return temp1, temp2
         
@@ -538,11 +538,16 @@ def allindices(string, sub, listindex=[], offset=0):
 
 if __name__ == "__main__":
 
-    #string1 = read_sequence("sequenceA.fasta")
-    #string2 = read_sequence("sequenceB.fasta")
+    #Mitochondrion Genomes
+    string1 = read_sequence("sequenceA.fasta")
+    string2 = read_sequence("sequenceB.fasta")
 
-    string1 = "AGTCCTAACTGGGGGGGGGGGGGGGTCGATTTGCCCCCCCTGATTAAC"
-    string2 = "TCAAATCGACGGGGGGGGGGGGGGGATGACACGCCCCCCCTGACTTGG"
+    #COX1 Gene
+    string1 = read_sequence("sequenceC.fasta")
+    string2 = read_sequence("sequenceD.fasta")
+
+    #string1 = "AGTCCTAACTGGGGGGGGGGGGGGGTCGATTTGCCCCCCCTGATTAAC"
+    #string2 = "TCAAATCGACGGGGGGGGGGGGGGGATGACACGCCCCCCCTGACTTGG"
     #string1 = "ACTTTCTTT"
     #string2 = "CCACAAATTTTAAA"
     #string1 = "TTTCCCC"
@@ -553,16 +558,17 @@ if __name__ == "__main__":
     print "Sequence B is....", string2
     print "Now trying to get all common substrings"
 
-    anchor_candidates = ""
+    anchor_candidates = []
 
     #counter = 3
     length_of_longest_common_substring = 0
 
-    result = get_common_substrings2(string1, string2, anchor_candidates)
+    result = get_common_substrings2(string1, string2)
 
+    print "The Alignment is"
     print result[0]
     print result[1]
-    print anchor_candidates
+    #print anchor_candidates
 
 ##    get_common_substrings(string1, string2, anchor_candidates, length_of_longest_common_substring)
 ##
