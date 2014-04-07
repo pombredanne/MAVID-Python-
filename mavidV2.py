@@ -325,22 +325,25 @@ def read_sequence(file_name):
     return output
 
 
-def mavid_align(str_a, str_b):
+def mavid_align(str_a, str_b, length_of_lcs):
     """
     This function recurively try to get the longest common strings
 
     This function only returns the common substings that are at least
     half as long as the longest common substrings
     """
-
-
-
-    #the_lcs = longest_common_substr_suffix(str_a, str_b)
-    the_lcs = longest_common_substr_dp(str_a, str_b)
-
-    if len(str_a) < 4 or len(str_b) < 4 or len(the_lcs) < 4:
+    if len(str_a) < 4 or len(str_b) < 4:
         
-        alignment = pairwise2.align.globalxx(str_a, str_b)
+        alignment = pairwise2.align.localxx(str_a, str_b)
+        return str(alignment[0][0]), str(alignment[0][1])
+
+
+    the_lcs = longest_common_substr_suffix(str_a, str_b)
+    #the_lcs = longest_common_substr_dp(str_a, str_b)
+
+    if len(the_lcs) < (0.5*length_of_lcs):
+        
+        alignment = pairwise2.align.localxx(str_a, str_b)
         return str(alignment[0][0]), str(alignment[0][1])
 
     else:
@@ -417,8 +420,8 @@ def mavid_align(str_a, str_b):
             new_str_a_back = str_a[lcs_end_index_str_a+1:]
             new_str_b_back = str_b[lcs_end_index_str_b+1:]
 
-        temp1 = mavid_align(new_str_a_front, new_str_b_front)[0] + the_lcs + mavid_align(new_str_a_back, new_str_b_back)[0]
-        temp2 = mavid_align(new_str_a_front, new_str_b_front)[1] + the_lcs + mavid_align(new_str_a_back, new_str_b_back)[1]
+        temp1 = mavid_align(new_str_a_front, new_str_b_front, length_of_lcs)[0] + the_lcs + mavid_align(new_str_a_back, new_str_b_back, length_of_lcs)[0]
+        temp2 = mavid_align(new_str_a_front, new_str_b_front, length_of_lcs)[1] + the_lcs + mavid_align(new_str_a_back, new_str_b_back, length_of_lcs)[1]
 
         return temp1, temp2
         
@@ -445,15 +448,22 @@ if __name__ == "__main__":
     #string2 = "CTT"
     print "Sequence A is....", string1
     print "Sequence B is....", string2
-    print "Now trying to get all common substrings"
+    print "Now trying to get the lenght of the longest common substrings"
 
-    result = mavid_align(string1, string2)
+    input_data = [string1, string2]
+    suffix_tree = SuffixTree()
+    for i in input_data:
+        suffix_tree.append_string(i)
+
+    length_of_lcs = len(suffix_tree.find_longest_common_substrings()[0])
+
+    result = mavid_align(string1, string2, length_of_lcs)
 
     print "The Alignment is"
     print result[0]
     print result[1]
 
-    print longest_common_substr_dp(string1, string2)
+    #print longest_common_substr_dp(string1, string2)
 
     print time.time() - start_time, "seconds"
 
